@@ -1,0 +1,47 @@
+id: org.freedesktop.Sdk.Extension.clojure
+branch: '23.08'
+runtime: org.freedesktop.Sdk
+build-extension: true
+sdk: org.freedesktop.Sdk
+runtime-version: '23.08'
+separate-locales: false
+appstream-compose: false
+add-extensions:
+  org.freedesktop.Sdk.Extension.openjdk21:
+    directory: openjdk21
+    version: '23.08'
+build-options:
+  prefix: /app/extension_directory/clojure
+  prepend-ld-library-path: /app/extension_directory/clojure/lib
+  prepend-path: /app/extension_directory/clojure/bin
+modules:
+  - name: rlwrap
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/hanslub42/rlwrap
+        tag: '0.46.1'
+    build-commands:
+      - autoreconf --install
+      - ./configure --prefix=${FLATPAK_DEST}
+      - make
+      - make install
+  - name: clojure
+    buildsystem: simple
+    sources:
+      - type: archive
+        url: https://github.com/clojure/brew-install/releases/download/1.11.3.1463/clojure-tools-1.11.3.1463.tar.gz
+        sha256: dba419de3e785f3b695b6589d7183419cf8ec2bb2f99f2b88afd06b0b57c1487
+      - type: patch
+        path: install.sh.patch
+    build-commands:
+      - ./install.sh ${FLATPAK_DEST}
+  - name: scripts
+    sources:
+      - type: script
+        commands:
+          - export PATH=$PATH:/usr/lib/sdk/clojure/bin
+        dest-filename: enable.sh
+    buildsystem: simple
+    build-commands:
+      - cp enable.sh /usr/lib/sdk/clojure
