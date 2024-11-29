@@ -1,19 +1,21 @@
 id: org.freedesktop.Sdk.Extension.clojure
-branch: '23.08'
+branch: '24.08'
 runtime: org.freedesktop.Sdk
 build-extension: true
 sdk: org.freedesktop.Sdk
-runtime-version: '23.08'
+runtime-version: '24.08'
 separate-locales: false
 appstream-compose: false
 add-extensions:
   org.freedesktop.Sdk.Extension.openjdk21:
     directory: openjdk21
-    version: '23.08'
+    version: '24.08'
 build-options:
   prefix: /app/extension_directory/clojure
   prepend-ld-library-path: /app/extension_directory/clojure/lib
   prepend-path: /app/extension_directory/clojure/bin
+  build-args:
+    - "--share=network"
 modules:
   - name: rlwrap
     buildsystem: simple
@@ -29,13 +31,11 @@ modules:
   - name: clojure
     buildsystem: simple
     sources:
-      - type: archive
-        url: https://github.com/clojure/brew-install/releases/download/1.11.3.1463/clojure-tools-1.11.3.1463.tar.gz
-        sha256: dba419de3e785f3b695b6589d7183419cf8ec2bb2f99f2b88afd06b0b57c1487
-      - type: patch
-        path: install.sh.patch
+      - type: file
+        url: https://github.com/clojure/brew-install/releases/download/1.12.0.1479/linux-install.sh
+        sha256: 94f29b9b66183bd58307c46fb561fd9e9148666bac13a4518a9931b6f989d830
     build-commands:
-      - ./install.sh ${FLATPAK_DEST}
+      - chmod +x ./linux-install.sh && ./linux-install.sh --prefix ${FLATPAK_DEST}
   - name: scripts
     sources:
       - type: script
